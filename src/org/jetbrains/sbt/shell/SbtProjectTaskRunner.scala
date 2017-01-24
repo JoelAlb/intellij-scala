@@ -84,7 +84,6 @@ class SbtProjectTaskRunner extends ProjectTaskRunner {
         val emptyURI = new URI("")
         val dataManager = ProjectDataManager.getInstance()
 
-
         for {
           projectInfo <- Option(dataManager.getExternalProjectData(project, SbtProjectSystem.Id, project.getBasePath))
           projectStructure <- Option(projectInfo.getExternalProjectStructure)
@@ -108,9 +107,8 @@ class SbtProjectTaskRunner extends ProjectTaskRunner {
     // run this as a task (which blocks a thread) because it seems non-trivial to just update indicators asynchronously?
     val task = new CommandTask(project) {
       override def run(indicator: ProgressIndicator): Unit = {
-        indicator.start()
         indicator.setIndeterminate(true)
-        indicator.setFraction(0)
+//        indicator.setFraction(0) // TODO how does the fraction thing work? can we also have an indicator without fraction?
         indicator.setText("queued sbt build")
 
         // TODO consider running module build tasks separately
@@ -123,10 +121,8 @@ class SbtProjectTaskRunner extends ProjectTaskRunner {
               callbackOpt.foreach(_.finished(taskResult))
               indicator.setFraction(1)
               indicator.setText("sbt build completed")
-              indicator.stop()
             case Failure(x) =>
               indicator.setText("sbt build failed")
-              indicator.cancel()
             // TODO some kind of feedback / rethrow
           }
 
@@ -156,4 +152,5 @@ class SbtProjectTaskRunner extends ProjectTaskRunner {
 
 }
 
-abstract class CommandTask(project: Project) extends Task.Backgroundable(project, "sbt build", false, PerformInBackgroundOption.DEAF)
+private abstract class CommandTask(project: Project) extends
+  Task.Backgroundable(project, "sbt build", false, PerformInBackgroundOption.ALWAYS_BACKGROUND)
