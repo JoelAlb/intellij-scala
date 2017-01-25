@@ -1,6 +1,11 @@
 package org.jetbrains.plugins.scala.failed.typeInference
 
+import java.util
+
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.PerfCycleTests
+import org.jetbrains.plugins.scala.base.libraryLoaders.{ScalaZLoader, ThirdPartyLibraryLoader}
 import org.jetbrains.plugins.scala.lang.typeInference.TypeInferenceTestBase
 import org.junit.experimental.categories.Category
 
@@ -10,7 +15,10 @@ import org.junit.experimental.categories.Category
   */
 @Category(Array(classOf[PerfCycleTests]))
 class ScalaZTest extends TypeInferenceTestBase {
-  override protected def additionalLibraries(): Array[String] = Array("scalaz")
+  override protected def additionalLibraries(project: Project, module: Module): util.List[ThirdPartyLibraryLoader] = {
+    import scala.collection.JavaConversions._
+    Seq(ScalaZLoader()(project, module))
+  }
 
   def testSCL5706(): Unit = {
     doTest(

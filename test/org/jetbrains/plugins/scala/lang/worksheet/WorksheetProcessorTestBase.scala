@@ -22,7 +22,7 @@ abstract class WorksheetProcessorTestBase extends ScalaCompilerTestBase {
 
   override def setUp(): Unit = {
     super.setUp()
-    addScalaSdk()
+    loadLibraries()
     addMacroPrinterDependency()
   }
 

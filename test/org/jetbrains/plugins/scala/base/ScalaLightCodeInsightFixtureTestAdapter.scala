@@ -14,19 +14,32 @@ import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 
 abstract class ScalaLightCodeInsightFixtureTestAdapter extends LightCodeInsightFixtureTestCase with TestFixtureProvider {
 
-  private var libLoader: ScalaLibraryLoader = _
+  private var libraryLoaders: Seq[LibraryLoader] = Seq.empty
+
+  override def getFixture: CodeInsightTestFixture = myFixture
 
   override protected def setUp() {
     super.setUp()
 
     if (loadScalaLibrary) {
       getFixture.allowTreeAccessForAllFiles()
-      libLoader = ScalaLibraryLoader.withMockJdk(getProject, getFixture.getModule, rootPath = null, isIncludeReflectLibrary = loadReflectLibrary)
-      libLoader.loadScala(libVersion)
+
+      implicit val project = getProject
+      implicit val module = getFixture.getModule
+
+      libraryLoaders = Seq(ScalaLibraryLoader(isIncludeReflectLibrary = loadReflectLibrary),
+        JdkLoader.mock)
     }
+
+    libraryLoaders.foreach(_.init)
   }
 
-  protected def libVersion: ScalaSdkVersion = TestUtils.DEFAULT_SCALA_SDK_VERSION
+  protected override def tearDown(): Unit = {
+    libraryLoaders.foreach(_.clean())
+    super.tearDown()
+  }
+
+  protected implicit def libVersion: ScalaSdkVersion = TestUtils.DEFAULT_SCALA_SDK_VERSION
 
   protected def loadScalaLibrary: Boolean = true
 
@@ -38,16 +51,6 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter extends LightCodeInsightF
 
     getFixture.testHighlighting(false, false, false, getFile.getVirtualFile)
   }
-
-  protected override def tearDown() {
-    if (libLoader != null) {
-      libLoader.clean()
-    }
-    libLoader = null
-    super.tearDown()
-  }
-
-  override def getFixture: CodeInsightTestFixture = myFixture
 }
 
 object ScalaLightCodeInsightFixtureTestAdapter {

@@ -19,7 +19,7 @@ import com.intellij.testFramework.{EdtTestUtil, ModuleTestCase, PsiTestUtil, Vfs
 import com.intellij.util.ThrowableRunnable
 import com.intellij.util.concurrency.Semaphore
 import com.intellij.util.ui.UIUtil
-import org.jetbrains.plugins.scala.base.ScalaLibraryLoader
+import org.jetbrains.plugins.scala.base.{JdkLoader, LibraryLoader, ScalaLibraryLoader, SourcesLoader}
 import org.jetbrains.plugins.scala.compiler.CompileServerLauncher
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.util.TestUtils
@@ -34,7 +34,7 @@ import scala.collection.mutable.ListBuffer
 abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
 
   private var deleteProjectAtTearDown = false
-  private var scalaLibraryLoader: ScalaLibraryLoader = _
+  private var libraryLoaders: Seq[LibraryLoader] = Seq.empty
 
   override def setUp(): Unit = {
     super.setUp()
@@ -69,11 +69,16 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
     }
   }
 
-  protected def addScalaSdk(loadReflect: Boolean = true) {
-    scalaLibraryLoader = new ScalaLibraryLoader(getProject, getModule, getSourceRootDir.getCanonicalPath,
-      loadReflect, Some(getTestProjectJdk))
+  protected def loadLibraries(): Unit = {
+    implicit val project = getProject
+    implicit val module = getModule
 
-    scalaLibraryLoader.loadScala(scalaSdkVersion)
+    libraryLoaders = Seq(ScalaLibraryLoader(isIncludeReflectLibrary = true),
+      JdkLoader(getTestProjectJdk),
+      SourcesLoader(getSourceRootDir.getCanonicalPath))
+
+    implicit val version = scalaSdkVersion
+    libraryLoaders.foreach(_.init)
   }
 
   protected def addIvyCacheLibrary(libraryName: String, libraryPath: String, jarNames: String*) {
@@ -87,16 +92,8 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
     PsiTestUtil.addLibrary(module, libraryName, pathExtended, jarNames: _*)
   }
 
-  override protected def getTestProjectJdk: Sdk = {
-//    val jdkTable = JavaAwareProjectJdkTableImpl.getInstanceEx
-//    if (scalaVersion.startsWith("2.12")) {
-//      DebuggerTestUtil.findJdk8()
-//    }
-//    else {
-//      jdkTable.getInternalJdk
-//    }
-      DebuggerTestUtil.findJdk8()
-  }
+  override protected def getTestProjectJdk: Sdk =
+    DebuggerTestUtil.findJdk8()
 
   protected def forceFSRescan() = BuildManager.getInstance.clearState(myProject)
 
@@ -107,8 +104,7 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
           CompilerTestUtil.disableExternalCompiler(myProject)
           CompileServerLauncher.instance.stop()
           val baseDir = getBaseDir
-          scalaLibraryLoader.clean()
-          scalaLibraryLoader = null
+          libraryLoaders.foreach(_.clean())
           ScalaCompilerTestBase.super.tearDown()
 
           if (deleteProjectAtTearDown) VfsTestUtil.deleteFile(baseDir)

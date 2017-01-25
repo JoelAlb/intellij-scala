@@ -20,7 +20,7 @@ import com.intellij.util.Processor
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.plugins.scala.ScalaLanguage
 import org.jetbrains.plugins.scala.annotator.{AnnotatorHolderMock, ScalaAnnotator}
-import org.jetbrains.plugins.scala.base.ScalaLibraryLoader
+import org.jetbrains.plugins.scala.base.{JdkLoader, LibraryLoader, ScalaLibraryLoader}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
@@ -66,13 +66,6 @@ class MemoryLeakTest extends PlatformTestCase {
     project
   }
 
-  protected def addScalaLibrary(project: Project): ScalaLibraryLoader = {
-    val module = ModuleManager.getInstance(project).getModules()(0)
-    val libraryLoader = ScalaLibraryLoader.withMockJdk(project, module, null)
-    libraryLoader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
-    libraryLoader
-  }
-
   protected def closeAndDispose(project: Project): Unit = {
     ProjectManagerEx.getInstanceEx.closeAndDispose(project)
     assertFalse(project.isOpen)
@@ -80,13 +73,12 @@ class MemoryLeakTest extends PlatformTestCase {
   }
 
   def testLeaksAfterProjectDispose(): Unit = {
-
-    val project = loadAndSetupProject(projectPath)
-    val libraryLoader = addScalaLibrary(project)
+    implicit val project = loadAndSetupProject(projectPath)
+    val libraryLoaders = MemoryLeakTest.scalaLibraries
 
     doSomeWork(project)
 
-    libraryLoader.clean()
+    libraryLoaders.foreach(_.clean())
 
     val allRoots = allRootsForProject(project)
 
@@ -148,4 +140,17 @@ class MemoryLeakTest extends PlatformTestCase {
     val picoContainer = project.getPicoContainer
     LeakHunter.allRoots().asScala :+ picoContainer
   }
+}
+
+object MemoryLeakTest {
+  private def scalaLibraries(implicit project: Project): Seq[LibraryLoader] = {
+    implicit val module = ModuleManager.getInstance(project).getModules()(0)
+    implicit val version = TestUtils.DEFAULT_SCALA_SDK_VERSION
+
+    val libraryLoaders = Seq(ScalaLibraryLoader(), JdkLoader.mock)
+    libraryLoaders.foreach(_.init)
+
+    libraryLoaders
+  }
+
 }

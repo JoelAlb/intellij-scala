@@ -1,12 +1,20 @@
 package org.jetbrains.plugins.scala.lang.typeInference.generated
 
+import java.util
+
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
+import org.jetbrains.plugins.scala.base.libraryLoaders.{CatsLoader, ThirdPartyLibraryLoader}
 import org.jetbrains.plugins.scala.lang.typeInference.TypeInferenceTestBase
 
 /**
   * @author Nikolay.Tropin
   */
 class TypeInferenceCatsTest extends TypeInferenceTestBase {
-  override protected def additionalLibraries(): Array[String] = Array("cats")
+  override protected def additionalLibraries(project: Project, module: Module): util.List[ThirdPartyLibraryLoader] = {
+    import scala.collection.JavaConversions._
+    Seq(CatsLoader()(project, module))
+  }
 
   override protected def folderPath: String = super.folderPath + "cats/"
 
