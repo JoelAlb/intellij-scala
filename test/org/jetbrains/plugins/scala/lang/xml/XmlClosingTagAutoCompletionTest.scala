@@ -2,14 +2,14 @@ package org.jetbrains.plugins.scala
 package lang.xml
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
+import org.jetbrains.plugins.scala.base.{EditorActionTestAdapter, ScalaLightCodeInsightFixtureTestAdapter}
 
 /**
  * User: Dmitry Naydanov
  * Date: 3/3/12
  */
 
-class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAdapter {
+class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAdapter with EditorActionTestAdapter {
 
   import CodeInsightTestFixture.CARET_MARKER
   
@@ -89,7 +89,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       |    </ul>
       |  </div>
       |</lift:TD.list>
-      """).stripMargin.replace("\r", "")
+                                       """).stripMargin
 
     val assumedStub =
       """
@@ -116,7 +116,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       |    </ul>
       |  </div>
       |</lift:TD.list>
-      """.stripMargin.replace("\r", "")
+      """.stripMargin
 
 
     checkGeneratedTextGt(text, assumedStub)
@@ -128,14 +128,14 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       | xml match {
       |   case <aaa""" + CARET_MARKER + """
       |}
-      """).stripMargin.replace("\r", "")
+                                        """).stripMargin
 
     val assumedStub =
       """
         | xml match {
         |   case <aaa></aaa>
         |}
-      """.stripMargin.replace("\r", "")
+      """.stripMargin
 
     checkGeneratedTextGt(text, assumedStub)
   }
@@ -146,14 +146,14 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       | xml match {
       |   case <aaa""" + CARET_MARKER + """
       |}
-      """).stripMargin.replace("\r", "")
+                                        """).stripMargin
 
     val assumedStub =
       """
         | xml match {
         |   case <aaa/>
         |}
-      """.stripMargin.replace("\r", "")
+      """.stripMargin
 
     checkGeneratedTextSlash(text, assumedStub)
   }
@@ -165,7 +165,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       |   case <a></a> =>
       |   case <aaa""" + CARET_MARKER + """
       | }
-      """).stripMargin.replace("\r", "")
+                                        """).stripMargin
 
     val assumedStub =
       """
@@ -173,7 +173,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
         |   case <a></a> =>
         |   case <aaa></aaa>
         | }
-      """.stripMargin.replace("\r", "")
+      """.stripMargin
 
     checkGeneratedTextGt(text, assumedStub)
   }
@@ -185,7 +185,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       |   case <a></a> =>
       |   case <aaa""" + CARET_MARKER + """
       | }
-      """).stripMargin.replace("\r", "")
+                                        """).stripMargin
 
     val assumedStub =
       """
@@ -193,7 +193,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
         |   case <a></a> =>
         |   case <aaa/>
         | }
-      """.stripMargin.replace("\r", "")
+      """.stripMargin
 
     checkGeneratedTextSlash(text, assumedStub)
   }
@@ -209,7 +209,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       """
         |val xml = <aaa attr="<aaa//>" />
         |xml match { 
-        |   case <aaa/""".stripMargin.replace("\r", "") 
+        |   case <aaa/""".stripMargin 
     
     val text = header + CARET_MARKER + ">  => 1  }"
     

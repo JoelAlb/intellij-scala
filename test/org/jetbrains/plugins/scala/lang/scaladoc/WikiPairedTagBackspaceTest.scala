@@ -2,13 +2,13 @@ package org.jetbrains.plugins.scala
 package lang.scaladoc
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
+import org.jetbrains.plugins.scala.base.{EditorActionTestAdapter, ScalaLightCodeInsightFixtureTestAdapter}
 
 /**
  * User: Dmitry Naydanov
  * Date: 2/27/12
  */
-class WikiPairedTagBackspaceTest extends ScalaLightCodeInsightFixtureTestAdapter {
+class WikiPairedTagBackspaceTest extends ScalaLightCodeInsightFixtureTestAdapter with EditorActionTestAdapter {
 
   import CodeInsightTestFixture.CARET_MARKER
   
@@ -57,7 +57,7 @@ class WikiPairedTagBackspaceTest extends ScalaLightCodeInsightFixtureTestAdapter
       |   * }
       |   *}}}
       |   */
-      """).stripMargin.replace("\r", "")
+                                    """).stripMargin
     val assumedStub =
       """
       | /**
@@ -67,7 +67,7 @@ class WikiPairedTagBackspaceTest extends ScalaLightCodeInsightFixtureTestAdapter
       |   * }
       |   *
       |   */
-      """.stripMargin.replace("\r", "")
+      """.stripMargin
 
     checkGeneratedTextAfterBackspace(text, assumedStub)
   }

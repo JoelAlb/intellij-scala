@@ -2,13 +2,13 @@ package org.jetbrains.plugins.scala
 package lang.scaladoc
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
+import org.jetbrains.plugins.scala.base.{EditorActionTestAdapter, ScalaLightCodeInsightFixtureTestAdapter}
 
 /**
  * User: Dmitry Naydanov
  * Date: 2/25/12
  */
-class WikiTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAdapter {
+class WikiTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAdapter with EditorActionTestAdapter {
 
   import CodeInsightTestFixture.CARET_MARKER
 

@@ -2,13 +2,13 @@ package org.jetbrains.plugins.scala
 package lang.scaladoc
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
+import org.jetbrains.plugins.scala.base.{EditorActionTestAdapter, ScalaLightCodeInsightFixtureTestAdapter}
 
 /**
  * User: Dmitry Naydanov
  * Date: 2/25/12
  */
-class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
+class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter with EditorActionTestAdapter {
 
   import CodeInsightTestFixture.CARET_MARKER
 
@@ -29,7 +29,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
     |    *    def f() {}
     |    * } }}""" + CARET_MARKER + """}
     |    */
-    """).stripMargin.replace("\r", "")
+                                    """).stripMargin
 
     val assumedStub =
       ("""
@@ -40,7 +40,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
     |    *    def f() {}
     |    * } }}}""" + CARET_MARKER + """
     |    */
-    """).stripMargin.replace("\r", "")
+                                     """).stripMargin
 
     checkGeneratedTextAfterTyping(text, assumedStub, '}')
   }
@@ -52,7 +52,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
       |   * ''blah blah blah blah
       |   *   blah blah blah '""" + CARET_MARKER + """'
       |   */
-      """).stripMargin.replace("\r", "")
+                                                   """).stripMargin
 
     val assumedStub =
       ("""
@@ -60,7 +60,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
       |   * ''blah blah blah blah
       |   *   blah blah blah ''""" + CARET_MARKER + """
       |   */
-      """).stripMargin.replace("\r", "")
+                                                    """).stripMargin
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\'')
   }
@@ -78,14 +78,14 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
       | /**
       |   * `blah-blah""" + CARET_MARKER + """`
       |   */
-      """).stripMargin.replace("\r", "")
+                                           """).stripMargin
 
     val assumedStub =
       ("""
       | /**
       |   * `blah-blah`""" + CARET_MARKER + """
       |   */
-      """).stripMargin.replace("\r", "")
+                                            """).stripMargin
 
     checkGeneratedTextAfterTyping(text, assumedStub, '`')
   }
@@ -104,7 +104,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
       |   * __blah blahblahblahblahblah
       |   *       blah blah blah blah""" + CARET_MARKER + """__
       |   */
-      """).stripMargin.replace("\r", "")
+                                                          """).stripMargin
 
     val assumedStub =
       ("""
@@ -112,7 +112,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
       |   * __blah blahblahblahblahblah
       |   *       blah blah blah blah_""" + CARET_MARKER + """_
       |   */
-      """).stripMargin.replace("\r", "")
+                                                           """).stripMargin
 
     checkGeneratedTextAfterTyping(text, assumedStub, '_')
   }

@@ -2,13 +2,13 @@ package org.jetbrains.plugins.scala
 package lang.actions.editor.backspace
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
+import org.jetbrains.plugins.scala.base.{EditorActionTestAdapter, ScalaLightCodeInsightFixtureTestAdapter}
 
 /**
  * User: Dmitry.Naydanov
  * Date: 31.07.14.
  */
-class StringLiteralBackspaceActionTest extends ScalaLightCodeInsightFixtureTestAdapter {
+class StringLiteralBackspaceActionTest extends ScalaLightCodeInsightFixtureTestAdapter with EditorActionTestAdapter {
 
   import CodeInsightTestFixture.CARET_MARKER
 

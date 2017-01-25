@@ -2,13 +2,13 @@ package org.jetbrains.plugins.scala
 package lang.actions.editor
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
+import org.jetbrains.plugins.scala.base.{EditorActionTestAdapter, ScalaLightCodeInsightFixtureTestAdapter}
 
 /**
  * User: Dmitry Naydanov
  * Date: 3/31/12
  */
-class InterpolatedStringTypingTest extends ScalaLightCodeInsightFixtureTestAdapter {
+class InterpolatedStringTypingTest extends ScalaLightCodeInsightFixtureTestAdapter with EditorActionTestAdapter {
 
   import CodeInsightTestFixture.CARET_MARKER
 
